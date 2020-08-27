@@ -81,6 +81,8 @@ namespace Exercicio_01_e_02
             // var texto = new StringBuilder();
             // melhor para trabalhar com concatenação de strings dentro de loops for / foreach / while
 
+            //teste
+
             foreach (string disci in guarda_disciplina)
             {
                 if (disci == null)
