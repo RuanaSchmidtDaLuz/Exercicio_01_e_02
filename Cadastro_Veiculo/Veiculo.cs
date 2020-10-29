@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Cadastro_de_Veiculo {
+
     public class Veiculo : IVeiculo {
+
         public int NumeroCadastro { get; set; }
         public int TpVeiculo { get; set; }
         public int Rodas { get; set; }
@@ -27,7 +29,8 @@ namespace Cadastro_de_Veiculo {
         const string SUCESSOVEICULOALUGADO = "Veículo Alugado com Sucesso!";
         const string SUCESSODEVOLVEVEICULO = "Veículo Devolvido com Sucesso!";
         const string SUCESSOREMOVEVEICULO = "Veículo Removido com Sucesso!";
-        
+
+        //esse construtor não está sendo usado, nesse caso não precisaria criá-lo
         public Veiculo(int tpVeiculo, int numeroCadastro, string marca, string modelo, string placa, string motor, int rodas, bool veiculoAlugado) {
             TpVeiculo = tpVeiculo;
             Marca = marca;
@@ -38,31 +41,53 @@ namespace Cadastro_de_Veiculo {
             NumeroCadastro = numeroCadastro;
             VeiculoAlugado = veiculoAlugado;
         }
-        public Veiculo() { }
 
+        public Veiculo() { } // construtor vazio tbm não precisa criar
+
+        // não entendi o que quis dizer com editVeic, para alugar ou devolver precisa receber um veículo editado?
+        // nesse caso poderia ser apenas 'public void AlugarVeiculo(Veiculo veiculo)'
         public void AlugarVeiculo(Veiculo editVeic) {
+
             if (editVeic.VeiculoAlugado)
                 Console.WriteLine(VEICULOALUGADO);
             else
+            {
                 editVeic.VeiculoAlugado = true;
                 Console.WriteLine(SUCESSOVEICULOALUGADO);
+            }
+
+            // quando tem mais de uma linha em um if ou else, tem que abrir chaves, senão o
+            // Console.WriteLine(SUCESSOVEICULOALUGADO) será sempre executado independente do if ou else
         }
+
         public void DevolveVeiculoAlugado(Veiculo editVeic) {
+
             if (!editVeic.VeiculoAlugado)
                 Console.WriteLine(DEVOLVEVEICULO);
             else
+            {
                 editVeic.VeiculoAlugado = false;
                 Console.WriteLine(SUCESSODEVOLVEVEICULO);
+            }
         }
+
         public void VeiculoAlugadoNaoPodeSerExcluido(Veiculo numberCadastro) {
+
             if (numberCadastro.VeiculoAlugado) {
-                Console.WriteLine(EXCLUSAOVEICULOALUGADO);
-            } else {
+                Console.WriteLine(EXCLUSAOVEICULOALUGADO); 
+            } 
+            else {   
                 Veiculos.Remove(numberCadastro);
                 Console.WriteLine(SUCESSOREMOVEVEICULO);
             }
+            // não é obrigação, mas facilita a leitura manter um padrão na identação dos if/elses
         }
-        public void CadastrarVeiculo(int tpVeiculo) {
+
+        // o que seria tpVeiculo? é legal evitar abreviações, e colocar TipoVeiculo
+        // até pra ficar mais claro, poderia ser um enum que identifique os tipos como
+        // Carro e Bicicleta
+        public void CadastrarVeiculo(int tpVeiculo) { 
+
             Random random = new Random();
             int numeroCadastro = random.Next(1, 101);
 
@@ -83,13 +108,14 @@ namespace Cadastro_de_Veiculo {
             int.TryParse(Console.ReadLine(), out int roda);
 
             int contPlaca = 0;
-            string placa = "";
+            string placa = string.Empty; // para strings vazias, é melhor usar string.empty, que já é uma constante em memória.
+
             do {
                 Console.Write("Placa: ");
                 placa = Console.ReadLine().ToUpper();
 
                 if (placa.Length > 0) {
-                    if (!veirificaPlacaExisteOutroVeiculo(placa)) {
+                    if (!verificaPlacaExisteOutroVeiculo(placa)) {
                         var resultPadraoPlaca = ValidarPadraoPlaca(placa);
                         if (resultPadraoPlaca) {
                             contPlaca++;
@@ -103,6 +129,15 @@ namespace Cadastro_de_Veiculo {
             } while (contPlaca == 0);
 
             bool veiculoAlugado = false;
+
+            // No caso, usando o enum não precisaria saber o que é tipo == 1 ou o que será se não for 1,
+            // pois identificará com o enum (tipoVeiculo == TiposVeiculos.Carro)
+
+            // é legal também separar cada função com uma responsabilidade única, ex:
+            // if (tipoVeiculo == TiposVeiculos.Carro) {
+            //     CadastrarCarro();
+            // else if (tipoVeiculo == TiposVeiculos.Bicicleta)
+            //     CadastrarBicicleta();
 
             if (tpVeiculo == 1) {
                 Console.Write("Nº Porta: ");
@@ -129,6 +164,7 @@ namespace Cadastro_de_Veiculo {
                 Veiculos.Add(novoVeiculo);
 
             } else {
+
                 Console.Write("Nº Guidão: ");
                 int.TryParse(Console.ReadLine(), out int guidao);
 
@@ -138,23 +174,31 @@ namespace Cadastro_de_Veiculo {
                 Console.Write("Nº Pedal: ");
                 int.TryParse(Console.ReadLine(), out int pedal);
 
-                var novoVeiculo = new Moto();
-                novoVeiculo.TpVeiculo = tpVeiculo;
-                novoVeiculo.Placa = placa;
-                novoVeiculo.Marca = marcaIni;
-                novoVeiculo.Modelo = modeloIni;
-                novoVeiculo.Motor = motor;
-                novoVeiculo.Guidao = guidao;
-                novoVeiculo.VeiculoAlugado = veiculoAlugado;
-                novoVeiculo.Pedal = pedal;
-                novoVeiculo.Marcha = marcha;
-                novoVeiculo.Rodas = roda;
-                novoVeiculo.NumeroCadastro = numeroCadastro;
+                var novoVeiculo = new Moto
+                {
+                    TpVeiculo = tpVeiculo,
+                    Placa = placa,
+                    Marca = marcaIni,
+                    Modelo = modeloIni,
+                    Motor = motor,
+                    Guidao = guidao,
+                    VeiculoAlugado = veiculoAlugado,
+                    Pedal = pedal,
+                    Marcha = marcha,
+                    Rodas = roda,
+                    NumeroCadastro = numeroCadastro
+                };
+
                 Veiculos.Add(novoVeiculo);
             }
         }
-        public bool veirificaPlacaExisteOutroVeiculo(string placa) {
+
+        // Nomes de funções é bom seguir o padrão (convenção) iniciando com a primeira letra maiúscula
+        // e as primeiras letras de variáveis minúsculas
+        public bool verificaPlacaExisteOutroVeiculo(string placa) {
+            
             foreach (var verifPlaca in Veiculos) {
+                
                 if (placa == verifPlaca.Placa) {
                     Console.WriteLine(PLACAEXISTEPARAOUTROVEICULO);
                     return true;
@@ -162,14 +206,16 @@ namespace Cadastro_de_Veiculo {
             }
             return false;
         }
+
         private static bool ValidarPadraoPlaca(string placa) {
-            if (string.IsNullOrWhiteSpace(placa)) 
-                { return false; }
+
+            if (string.IsNullOrWhiteSpace(placa)) // não precisa abrir chaves quando tem só uma linha após o if
+                return false;
 
             if (placa.Length > 8) 
-                { return false; }
+                return false;
 
-            placa = placa.Replace("-", "").Trim();
+            placa = placa.Replace("-", string.Empty).Trim(); // usar string.Empty em vez de string.Empty
 
             if (char.IsLetter(placa, 4)) {
                 var padraoMercosul = new Regex("[a-zA-Z]{3}[0-9]{1}[a-zA-Z]{1}[0-9]{2}");
@@ -179,10 +225,14 @@ namespace Cadastro_de_Veiculo {
                 return padraoNormal.IsMatch(placa);
             }
         }
+
         public void EditarVeiculo() {
+
             Console.Write(OPCAOEDITAREEXCLUIR);
             int numberEditar = int.Parse(Console.ReadLine());
-            foreach (var editVeic in Veiculos) {
+
+            foreach (var editVeic in Veiculos) { // usar um nome mais claro em vez de abreviacao, ex: foreach (var veiculoEmEdicao in Veiculos)
+
                 if (numberEditar == editVeic.NumeroCadastro) {
                     EditVeiculo(editVeic);
                     break;
@@ -190,7 +240,9 @@ namespace Cadastro_de_Veiculo {
             }
             Console.WriteLine(VEICNAOENCONTRADO);
         }
+
         public void EditVeiculo(Veiculo editVeic) {
+
             bool validaCampoInt;
 
             Console.WriteLine("Nº Cadastro do Veículo: {0}", editVeic.NumeroCadastro);
@@ -198,6 +250,7 @@ namespace Cadastro_de_Veiculo {
             Console.WriteLine("Modelo Atual: {0}", editVeic.Modelo);
             Console.Write("Novo Modelo: ");
             string modelo = Console.ReadLine();
+            
             if (modelo.Length != 0 && modelo != editVeic.Modelo) {
                 var novoModelo = char.ToUpper(modelo[0]) + modelo.Substring(1);
                 editVeic.Modelo = novoModelo;
@@ -206,6 +259,7 @@ namespace Cadastro_de_Veiculo {
             Console.WriteLine("Modelo Atual: {0}", editVeic.Marca);
             Console.Write("Nova Marca: ");
             string marca = Console.ReadLine();
+
             if (marca.Length != 0 && marca != editVeic.Marca) {
                 var novoMarca = char.ToUpper(marca[0]) + marca.Substring(1);
                 editVeic.Marca = novoMarca;
@@ -214,6 +268,7 @@ namespace Cadastro_de_Veiculo {
             Console.WriteLine("Potência do Motor Atual: {0}", editVeic.Motor);
             Console.Write("Nova Potência de Motor: ");
             string motor = Console.ReadLine();
+            
             if (motor.Length != 0 && motor != editVeic.Motor) {
                 editVeic.Motor = motor;
             }
@@ -221,30 +276,35 @@ namespace Cadastro_de_Veiculo {
             Console.WriteLine("Nº Roda Atual: {0}", editVeic.Rodas);
             Console.Write("Novo Nº Roda: ");
             validaCampoInt = int.TryParse(Console.ReadLine(), out int roda);
-            if (validaCampoInt) {
-                if (roda != editVeic.Rodas) {
-                    editVeic.Rodas = roda;
-                }
+
+            if (validaCampoInt && roda != editVeic.Rodas) {
+                editVeic.Rodas = roda;
             }
 
             int contPlaca = 0;
-            string placa = "";
+            string placa = string.Empty;
             do {
+                
                 Console.Write("Placa: ");
                 placa = Console.ReadLine().ToUpper();
+                
                 if (placa.Length != 0 && placa != editVeic.Placa) {
-                    if (!veirificaPlacaExisteOutroVeiculo(placa)) {
+
+                    if (!verificaPlacaExisteOutroVeiculo(placa)) {
+
                         var resultPadraoPlaca = ValidarPadraoPlaca(placa);
-                        if (resultPadraoPlaca) {
+                        if (resultPadraoPlaca)
+                        {
                             editVeic.Placa = placa;
                             contPlaca++;
-                        } else {
-                            Console.WriteLine(PLACAFORADOPADRAO);
                         }
+                        else
+                            Console.WriteLine(PLACAFORADOPADRAO);
                     }
-                } else {
+                } 
+                else 
                     contPlaca++;
-                }
+
             } while (contPlaca == 0);
 
             Console.WriteLine("Veículo Alugado: {0}", editVeic.TpVeiculo);
@@ -267,61 +327,59 @@ namespace Cadastro_de_Veiculo {
                 Console.WriteLine("Nº de Portas Atual: {0}", carro.Porta);
                 Console.Write("Novo Nº de Portas: ");
                 validaCampoInt = int.TryParse(Console.ReadLine(), out int portas);
-                if (validaCampoInt) {
-                    if (portas != carro.Porta) {
-                        carro.Porta = portas;
-                    }
+
+                if (validaCampoInt && portas != carro.Porta) {
+                    carro.Porta = portas;
                 }
 
                 Console.WriteLine("Nº de Porta Malas Atual: {0}", carro.PortaMalas);
                 Console.Write("Novo Nº de Porta Malas: ");
                 validaCampoInt = int.TryParse(Console.ReadLine(), out int portaMalas);
-                if (validaCampoInt) {
-                    if (portaMalas != carro.PortaMalas) {
-                        carro.PortaMalas = portaMalas;
-                    }
+
+                // pode juntar os dois ifs em um &&
+                if (validaCampoInt && portaMalas != carro.PortaMalas) {
+                    carro.PortaMalas = portaMalas;
                 }
 
                 Console.WriteLine("Nº de Parabrisas Atual: {0}", carro.ParaBrisa);
                 Console.Write("Novo Nº de Parabrisas: ");
                 validaCampoInt = int.TryParse(Console.ReadLine(), out int parabrisas);
-                if (validaCampoInt) {
-                    if (parabrisas != carro.ParaBrisa) {
-                        carro.ParaBrisa = parabrisas;
-                    }
+
+                if (validaCampoInt && parabrisas != carro.ParaBrisa) {
+                    carro.ParaBrisa = parabrisas;
                 }
+
             } else {
+
                 var moto = editVeic as Moto;
 
                 Console.WriteLine("Nº Guidão Atual: {0}", moto.Guidao);
                 Console.Write("Novo Guidão: ");
                 validaCampoInt = int.TryParse(Console.ReadLine(), out int guidao);
-                if (validaCampoInt) {
-                    if (guidao != moto.Guidao) {
-                        moto.Guidao = guidao;
-                    }
+                
+                if (validaCampoInt && guidao != moto.Guidao) {
+                    moto.Guidao = guidao;
                 }
 
                 Console.WriteLine("Nº Marchas: {0}", moto.Marcha);
                 Console.Write("Nº Marchas: ");
                 validaCampoInt = int.TryParse(Console.ReadLine(), out int marchas);
-                if (validaCampoInt) {
-                    if (marchas != moto.Marcha) {
-                        moto.Marcha = marchas;
-                    }
+                
+                if (validaCampoInt && marchas != moto.Marcha) {
+                    moto.Marcha = marchas;
                 }
 
                 Console.WriteLine("Nº Pedais: {0}", moto.Pedal);
                 Console.Write("Nº Pedais: ");
                 validaCampoInt = int.TryParse(Console.ReadLine(), out int pedais);
-                if (validaCampoInt) {
-                    if (pedais != moto.Pedal) {
-                        moto.Pedal = pedais;
-                    }
+                if (validaCampoInt && pedais != moto.Pedal) {
+                    moto.Pedal = pedais;
                 }
             }
         }
+
         public void ExcluirVeiculo() {
+
             Console.Write(OPCAOEDITAREEXCLUIR);
             int numberExcluir = int.Parse(Console.ReadLine());
 
@@ -333,10 +391,13 @@ namespace Cadastro_de_Veiculo {
             }
             Console.WriteLine(VEICNAOENCONTRADO);
         }
+
         public List<Veiculo> ListarVeiculos() {
             return Veiculos;
         }
+        
         public Veiculo ListarVeiculoPorPlaca(string placa) {
+
             foreach (var veiculo in Veiculos) {
                 if (veiculo.Placa == placa) {
                     return veiculo;
@@ -344,11 +405,15 @@ namespace Cadastro_de_Veiculo {
             }
             return null;
         }
+        
+        // dar uns espaçamentos, e um if com até duas condições não tem problema colocar na mesma linha
         public List<Veiculo> ListarVeiculosPorMarcaEModelo(string marca, string modelo) {
+
             List<Veiculo> listaMarcaEModelo = new List<Veiculo>();
+            
             foreach (var veiculo in Veiculos) {
-                if (veiculo.Marca == marca
-                    && veiculo.Modelo == modelo) {
+
+                if (veiculo.Marca == marca && veiculo.Modelo == modelo) {
                     listaMarcaEModelo.Add(veiculo);
                 }
             }
