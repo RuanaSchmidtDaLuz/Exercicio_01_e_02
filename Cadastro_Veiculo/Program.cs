@@ -4,7 +4,9 @@ using System.Linq;
 
 namespace Cadastro_de_Veiculo {
     class Program {
+
         public static void MenuPrincipal() {
+        
             Console.Clear();
             Console.WriteLine("Sistema de Veículo");
             Console.WriteLine("1 - Cadastre Novo Carro");
@@ -16,24 +18,32 @@ namespace Cadastro_de_Veiculo {
             Console.WriteLine("7 - Listar Veículos por Marca e Modelo");
             Console.WriteLine("0 - Sair");
         }
-        private static void LimpaExibiMenu() {
+
+        private static void LimparExibirMenu() {
+
             Console.ReadLine();
             MenuPrincipal();
         }
 
         const string NENHUMVEICULO = "Não há Veículos Cadastrados";
+
         static void Main(string[] args) {
+        
             var veiculo = new Veiculo();
+            
+            // essas duas variáveis não estão sendo utilizadas
+            // (usar o sonarLint para verificar essas questões)
             var placaEncontrada = new Veiculo();
             var veiculos = new List<Veiculo>();
+
             const string OPCAOESCOLHA = "Escolha uma Opção: ";
             const string PLACANAOENCONTRADA = "Placa não encontrada para nenhum veículo!";
             const string OPINV = "Opção inválida!!";
-            string placa = "";
-            string marca = "";
-            string modelo = "";
-            string modeloOficial = "";
-            string marcaOficial = "";
+            string placa = string.Empty;
+            string marca = string.Empty;
+            string modelo = string.Empty;
+            string modeloOficial = string.Empty;
+            string marcaOficial = string.Empty;
             int opcao = 0;
             int tpVeiculo = 0;
 
@@ -45,83 +55,111 @@ namespace Cadastro_de_Veiculo {
                 switch (opcao) {
                     case 0:
                         break;
+
                     case 1:
-                        tpVeiculo = 1;
+                        tpVeiculo = 1; // usar os enums ou constantes
                         veiculo.CadastrarVeiculo(tpVeiculo);
-                        LimpaExibiMenu();
+                        LimparExibirMenu();
                         break;
+                    
                     case 2:
                         tpVeiculo = 2;
                         veiculo.CadastrarVeiculo(tpVeiculo);
-                        LimpaExibiMenu();
+                        LimparExibirMenu();
                         break;
+                    
                     case 3:
                         veiculo.EditarVeiculo();
-                        LimpaExibiMenu();
+                        LimparExibirMenu();
                         break;
+                    
                     case 4:
                         veiculo.ExcluirVeiculo();
-                        LimpaExibiMenu();
+                        LimparExibirMenu();
                         break;
+                    
                     case 5:
                         veiculos = veiculo.ListarVeiculos();
                         VisualizarTodosVeiculos(veiculos);
-                        LimpaExibiMenu();
+                        LimparExibirMenu();
                         break;
+                    
                     case 6:
+
                         placa = SolicitaPlaca(placa);
                         placaEncontrada = veiculo.ListarVeiculoPorPlaca(placa);
+                        
                         if (placaEncontrada == null) {
                             Console.WriteLine(PLACANAOENCONTRADA);
-                        } else {
+                        } 
+                        else {
                             VisualizarVeiculos(placaEncontrada);
                         }
-                        LimpaExibiMenu();
+                        
+                        LimparExibirMenu();
                         break;
+                    
                     case 7:
+                        
                         marcaOficial = SolicitaMarca(marca);
                         modeloOficial = SolicitaModelo(modelo);
                         veiculos = veiculo.ListarVeiculosPorMarcaEModelo(marcaOficial, modeloOficial);
+                        
                         VisualizarTodosVeiculos(veiculos);
-                        LimpaExibiMenu();
+                        LimparExibirMenu();
                         break;
+
                     default:
                         Console.WriteLine(OPINV);
-                        LimpaExibiMenu();
+                        LimparExibirMenu();
                         break;
                 }
             } while (opcao != 0);
         }
+
         public static string SolicitaPlaca(string placa) {
+
             Console.Write("Placa do Veículo que Deseja Listar: ");
             placa = Console.ReadLine().ToUpper();
             return placa;
         }
+
         public static string SolicitaModelo(string modelo) {
+
             Console.Write("Modelo Veículo: ");
             modelo = Console.ReadLine();
+
             var modeloOficial = char.ToUpper(modelo[0]) + modelo.Substring(1);
             return modeloOficial;
         }
+
         public static string SolicitaMarca(string marca) {
+
             Console.Write("Marca Veículo: ");
             marca = Console.ReadLine();
+
             var marcaOficial = char.ToUpper(marca[0]) + marca.Substring(1);
             return marcaOficial;
         }
+
         public static void VisualizarVeiculos(Veiculo placaEncontrada) {
+
             if (placaEncontrada.TpVeiculo == 1) {
                 var carro = placaEncontrada as Carro;
                 carro.ExibirVeiculos(carro);
-            } else {
+            } 
+            else {
                 var moto = placaEncontrada as Moto;
                 moto.ExibirVeiculos(moto);
             }
         }
         private static void VisualizarTodosVeiculos(List<Veiculo> veiculos) {
+
             if (veiculos.Count > 0) {
+                
                 var orderNumeroCadastro = veiculos.OrderBy(veic => veic.NumeroCadastro);
                 foreach (Veiculo veiculo in orderNumeroCadastro) {
+
                     if (veiculo.TpVeiculo == 1) {
                         var carro = veiculo as Carro;
                         carro.ExibirVeiculos(carro);
@@ -130,9 +168,11 @@ namespace Cadastro_de_Veiculo {
                         moto.ExibirVeiculos(moto);
                     }
                 }
+
                 Console.WriteLine();
                 Console.WriteLine($"Total de Veiculos: {veiculos.Count}");
-            } else {
+            } 
+            else {
                 Console.WriteLine(NENHUMVEICULO);
             }
         }
